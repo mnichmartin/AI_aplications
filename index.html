@@ -1,164 +1,604 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Odkazy na aplikace AI</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 20px;
-        }
-        .app-container {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin: 10px;
-            padding: 20px;
-            text-align: center;
-            width: 250px;
-        }
-        .app-container img {
-            border-radius: 8px;
-            height: 150px;
-            width: 100%;
-            object-fit: cover;
-        }
-        .app-container button {
-            background-color: #007bff;
-            border: none;
-            border-radius: 4px;
-            color: #fff;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 10px;
-            padding: 10px 20px;
-            width: 100%;
-        }
-        .app-container button:hover {
-            background-color: #0056b3;
-        }
-        .app-container.red-button button {
-            background-color: #dc3545;
-        }
-        .app-container.red-button button:hover {
-            background-color: #b02a37;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zpěvník – audit-ready MVP</title>
+  <style>
+    :root {
+      --bg: #0f1221;
+      --panel: #181c30;
+      --panel-2: #202645;
+      --text: #e8ecff;
+      --muted: #b5bedf;
+      --accent: #6ea8fe;
+      --accent-2: #4f8ef7;
+      --ok: #5cc489;
+      --danger: #ff6f7d;
+      --border: #31385f;
+      --chip: #2a3158;
+      --shadow: 0 14px 28px rgba(4, 10, 30, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top, #1c2342 0%, var(--bg) 40%);
+      color: var(--text);
+      font-family: Inter, Arial, sans-serif;
+      min-height: 100vh;
+      line-height: 1.45;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .panel {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent), var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .left-panel {
+      padding: 18px;
+      position: sticky;
+      top: 16px;
+      height: calc(100vh - 32px);
+      overflow: auto;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.6rem;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin: 8px 0 16px;
+      font-size: 0.95rem;
+    }
+
+    .toolbar {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .toolbar input,
+    .toolbar select,
+    textarea,
+    .song-form input {
+      width: 100%;
+      padding: 11px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    .toolbar input:focus,
+    .toolbar select:focus,
+    textarea:focus,
+    .song-form input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(110, 168, 254, 0.2);
+    }
+
+    .button-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 1px solid transparent;
+      border-radius: 10px;
+      color: #fff;
+      background: var(--accent);
+      padding: 10px 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    button:hover { background: var(--accent-2); }
+
+    .ghost {
+      background: transparent;
+      border-color: var(--border);
+      color: var(--text);
+    }
+
+    .danger {
+      background: rgba(255, 111, 125, 0.2);
+      border-color: rgba(255, 111, 125, 0.5);
+      color: #ffd2d8;
+    }
+
+    .chip-list {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .chip {
+      border-radius: 999px;
+      background: var(--chip);
+      border: 1px solid var(--border);
+      padding: 3px 10px;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .songs {
+      padding: 18px;
+    }
+
+    .song-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 14px;
+    }
+
+    .song-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .song-card h3 {
+      margin: 0;
+      font-size: 1.06rem;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .lyrics {
+      white-space: pre-wrap;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.9rem;
+      max-height: 240px;
+      overflow: auto;
+    }
+
+    .song-form {
+      margin-top: 16px;
+      display: grid;
+      gap: 10px;
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+    }
+
+    .song-form .inline {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .status {
+      margin-top: 8px;
+      font-size: 0.86rem;
+      color: var(--ok);
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 999px;
+      padding: 2px 8px;
+    }
+
+    @media (max-width: 950px) {
+      .layout { grid-template-columns: 1fr; }
+      .left-panel { position: static; height: auto; }
+    }
+  </style>
 </head>
 <body>
+  <main class="layout">
+    <section class="panel left-panel">
+      <h1>🎵 Zpěvník</h1>
+      <p class="subtitle">MVP připravené pro audit: vyhledávání, filtrování, oblíbené, transpozice, setlist a import/export JSON.</p>
 
-    <div class="app-container">
-        <img src="suno_image.jpg" alt="Suno">
-        <h3>Suno</h3>
-        <p>AI platforma umožňující tvorbu hudby pomocí textových vstupů.</p>
-        <button onclick="window.open('https://suno.com/', '_blank')">Navštívit Suno</button>
-    </div>
+      <div class="toolbar">
+        <input id="searchInput" type="text" placeholder="Hledat název, interpreta, text...">
+        <select id="tagFilter">
+          <option value="">Všechny štítky</option>
+        </select>
+        <label>
+          <input id="onlyFavorites" type="checkbox"> Pouze oblíbené
+        </label>
+      </div>
 
-    <div class="app-container">
-        <img src="cleanup_pictures_image.jpg" alt="Cleanup.pictures">
-        <h3>Cleanup.pictures</h3>
-        <p>Nástroj pro odstranění nechtěných objektů z fotografií.</p>
-        <button onclick="window.open('https://cleanup.pictures/', '_blank')">Navštívit Cleanup.pictures</button>
-    </div>
+      <div class="button-row">
+        <button id="transposeDown" class="ghost">♭ -1 půltón</button>
+        <button id="transposeUp" class="ghost">♯ +1 půltón</button>
+        <button id="resetTranspose" class="ghost">Reset</button>
+      </div>
 
-    <div class="app-container">
-        <img src="pimeyes_image.jpg" alt="PimEyes">
-        <h3>PimEyes</h3>
-        <p>Vyhledávač obličejů využívající technologii rozpoznávání tváře.</p>
-        <button onclick="window.open('https://pimeyes.com/en', '_blank')">Navštívit PimEyes</button>
-    </div>
+      <div class="button-row" style="margin-top: 8px;">
+        <button id="exportBtn">Export JSON</button>
+        <button id="importBtn" class="ghost">Import JSON</button>
+        <input id="importFile" type="file" accept="application/json" hidden>
+      </div>
 
-    <div class="app-container">
-        <img src="quickdraw_image.jpg" alt="Quick, Draw!">
-        <h3>Quick, Draw!</h3>
-        <p>Hra od Googlu, kde neuronová síť hádá, co kreslíte.</p>
-        <button onclick="window.open('https://quickdraw.withgoogle.com/', '_blank')">Hrát Quick, Draw!</button>
-    </div>
+      <form id="songForm" class="song-form">
+        <h2 style="margin:0;font-size:1.1rem;">Přidat píseň</h2>
+        <input id="songTitle" required placeholder="Název písně">
+        <div class="inline">
+          <input id="songArtist" required placeholder="Interpret">
+          <input id="songKey" placeholder="Tónina (např. C, Dm)">
+        </div>
+        <input id="songTags" placeholder="Štítky oddělené čárkou (např. chvály, mládež)">
+        <textarea id="songLyrics" rows="8" required placeholder="Text + akordy v hranatých závorkách, např. [C]Tvé jméno je [G]síla"></textarea>
+        <button type="submit">Uložit píseň</button>
+        <p id="status" class="status" aria-live="polite"></p>
+      </form>
+    </section>
 
-    <div class="app-container">
-        <img src="autodraw_image.jpg" alt="AutoDraw">
-        <h3>AutoDraw</h3>
-        <p>Nástroj od Googlu, který pomocí AI pomáhá rychle kreslit.</p>
-        <button onclick="window.open('https://www.autodraw.com/', '_blank')">Použít AutoDraw</button>
-    </div>
+    <section class="panel songs">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+        <h2 style="margin:0;">Katalog písní</h2>
+        <span id="stats" class="badge"></span>
+      </div>
+      <p class="subtitle" style="margin-top:8px;">Tip: klikněte na ⭐ pro oblíbené a ➕ Setlist pro plán bohoslužby/zkoušky.</p>
+      <div id="songGrid" class="song-grid"></div>
+      <h2 style="margin-top:20px;">🗒️ Setlist</h2>
+      <div id="setlist" class="chip-list"></div>
+    </section>
+  </main>
 
-    <div class="app-container">
-        <img src="character_ai_image.jpg" alt="Character.AI">
-        <h3>Character.AI</h3>
-        <p>Platforma pro vytváření a interakci s virtuálními postavami.</p>
-        <button onclick="window.open('https://character.ai/', '_blank')">Navštívit Character.AI</button>
-    </div>
+  <script>
+    const STORAGE_KEY = 'zpevnik_v1';
+    const TRANSPOSE_KEY = 'zpevnik_transpose';
+    const SETLIST_KEY = 'zpevnik_setlist';
 
-    <div class="app-container">
-        <img src="elevenlabs_image.jpg" alt="ElevenLabs">
-        <h3>ElevenLabs</h3>
-        <p>Pokročilý nástroj pro syntézu řeči a klonování hlasu pomocí AI.</p>
-        <button onclick="window.open('https://elevenlabs.io/', '_blank')">Navštívit ElevenLabs</button>
-    </div>
+    const NOTES_SHARP = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    const NOTES_FLAT_EQ = { Db: 'C#', Eb: 'D#', Gb: 'F#', Ab: 'G#', Bb: 'A#', H: 'B' };
 
-    <div class="app-container">
-        <img src="isitai_image.jpg" alt="IsItAI">
-        <h3>IsItAI</h3>
-        <p>Nástroj pro detekci obsahu generovaného umělou inteligencí.</p>
-        <button onclick="window.open('https://isitai.com/', '_blank')">Navštívit IsItAI</button>
-    </div>
+    const defaults = [
+      {
+        id: crypto.randomUUID(),
+        title: 'Oceány',
+        artist: 'Hillsong',
+        key: 'D',
+        tags: ['chvály', 'bohoslužba'],
+        favorite: false,
+        lyrics: '[D]Ty mě voláš [A]ven tam, kde noha [Bm]má se může [G]bát\n[D]A tam Tě najdu [A]v tajemství [Bm]vln a [G]hladin\n'
+      },
+      {
+        id: crypto.randomUUID(),
+        title: 'Way Maker',
+        artist: 'Leeland',
+        key: 'E',
+        tags: ['anglicky', 'modlitba'],
+        favorite: true,
+        lyrics: '[E]You are here, moving in our [B]midst\nI worship [C#m]You, I worship [A]You\n'
+      }
+    ];
 
-    <div class="app-container">
-        <img src="chatgpt_image.jpg" alt="ChatGPT">
-        <h3>ChatGPT</h3>
-        <p>Pokročilý AI chatbot od společnosti OpenAI.</p>
-        <button onclick="window.open('https://chat.openai.com/', '_blank')">Navštívit ChatGPT</button>
-    </div>
+    const state = {
+      songs: loadSongs(),
+      transpose: Number(localStorage.getItem(TRANSPOSE_KEY) || 0),
+      setlist: JSON.parse(localStorage.getItem(SETLIST_KEY) || '[]')
+    };
 
-<div class="app-container">
-    <img src="microsoft_copilot_image.jpg" alt="Microsoft Copilot">
-    <h3>Microsoft Copilot</h3>
-    <p>AI asistent od společnosti Microsoft, navržený pro zvýšení produktivity a efektivity uživatelů.</p>
-    <button onclick="window.open('https://copilot.microsoft.com/', '_blank')">Navštívit Microsoft Copilot</button>
-</div>
+    const el = {
+      searchInput: document.getElementById('searchInput'),
+      tagFilter: document.getElementById('tagFilter'),
+      onlyFavorites: document.getElementById('onlyFavorites'),
+      songGrid: document.getElementById('songGrid'),
+      stats: document.getElementById('stats'),
+      setlist: document.getElementById('setlist'),
+      transposeDown: document.getElementById('transposeDown'),
+      transposeUp: document.getElementById('transposeUp'),
+      resetTranspose: document.getElementById('resetTranspose'),
+      exportBtn: document.getElementById('exportBtn'),
+      importBtn: document.getElementById('importBtn'),
+      importFile: document.getElementById('importFile'),
+      songForm: document.getElementById('songForm'),
+      songTitle: document.getElementById('songTitle'),
+      songArtist: document.getElementById('songArtist'),
+      songKey: document.getElementById('songKey'),
+      songTags: document.getElementById('songTags'),
+      songLyrics: document.getElementById('songLyrics'),
+      status: document.getElementById('status')
+    };
 
-    <div class="app-container">
-        <img src="geminy_image.jpg" alt="GEMINY">
-        <h3>GEMINY</h3>
-        <p>Pokročilý multimodální AI model od Google DeepMind.</p>
-        <button onclick="window.open('https://gemini.google.com/app?hl=cs', '_blank')">Navštívit GEMINY</button>
-    </div>
+    function loadSongs() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return defaults;
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : defaults;
+      } catch {
+        return defaults;
+      }
+    }
 
-    <div class="app-container">
-        <img src="mistral_image.jpg" alt="MISTRAL">
-        <h3>MISTRAL</h3>
-        <p>Open-source AI model zaměřený na překonání současných standardů.</p>
-        <button onclick="window.open('https://mistral.ai/', '_blank')">Navštívit MISTRAL</button>
-    </div>
+    function saveSongs() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.songs));
+    }
 
-    <div class="app-container">
-        <img src="deepseek_image.jpg" alt="DEEPSEEK">
-        <h3>DEEPSEEK</h3>
-        <p>Čínský AI model známý svou efektivitou a výkonem.</p>
-        <button onclick="window.open('https://deepseek.ai/', '_blank')">Navštívit DeepSeek</button>
-    </div>
+    function saveTranspose() {
+      localStorage.setItem(TRANSPOSE_KEY, String(state.transpose));
+    }
 
-    <div class="app-container">
-        <img src="claude_image.jpg" alt="Sonet Claude 3.7">
-        <h3>Sonet Claude 3.7</h3>
-        <p>Pokročilý AI chatbot od společnosti Anthropic, zaměřený na bezpečnost a spolehlivost.</p>
-        <button onclick="window.open('https://claude.ai/', '_blank')">Navštívit Claude 3.7</button>
-    </div>
+    function saveSetlist() {
+      localStorage.setItem(SETLIST_KEY, JSON.stringify(state.setlist));
+    }
 
+    function normalize(note) {
+      return NOTES_FLAT_EQ[note] || note;
+    }
 
-    <div class="app-container red-button">
-        <img src="centrum_image.jpg" alt="Centrum.cz">
-        <h3>Centrum.cz</h3>
-        <p>Český internetový portál s e-mailem a zprávami.</p>
-        <button onclick="window.open('https://ucet.centrum.cz/prihlaseni/', '_blank')">Navštívit Centrum.cz</button>
-    </div>
+    function transposeChord(chord, steps) {
+      const match = chord.match(/^([A-H][#b]?)(.*)$/);
+      if (!match) return chord;
+      const root = normalize(match[1]);
+      const suffix = match[2] || '';
+      const index = NOTES_SHARP.indexOf(root);
+      if (index === -1) return chord;
+      const newIndex = (index + steps + 12) % 12;
+      return NOTES_SHARP[newIndex] + suffix;
+    }
 
+    function transposeLyrics(text, steps) {
+      if (!steps) return text;
+      return text.replace(/\[([^\]]+)\]/g, (_, chord) => `[${transposeChord(chord.trim(), steps)}]`);
+    }
+
+    function filteredSongs() {
+      const q = el.searchInput.value.trim().toLowerCase();
+      const tag = el.tagFilter.value;
+      const onlyFav = el.onlyFavorites.checked;
+
+      return state.songs.filter(song => {
+        const haystack = `${song.title} ${song.artist} ${song.lyrics} ${(song.tags || []).join(' ')}`.toLowerCase();
+        const matchesQ = !q || haystack.includes(q);
+        const matchesTag = !tag || (song.tags || []).includes(tag);
+        const matchesFav = !onlyFav || song.favorite;
+        return matchesQ && matchesTag && matchesFav;
+      });
+    }
+
+    function uniqueTags() {
+      const all = state.songs.flatMap(s => s.tags || []);
+      return [...new Set(all)].sort((a, b) => a.localeCompare(b, 'cs'));
+    }
+
+    function renderTagFilter() {
+      const current = el.tagFilter.value;
+      const tags = uniqueTags();
+      el.tagFilter.innerHTML = '<option value="">Všechny štítky</option>' + tags.map(tag => `<option value="${tag}">${tag}</option>`).join('');
+      if (tags.includes(current)) el.tagFilter.value = current;
+    }
+
+    function toggleFavorite(id) {
+      const song = state.songs.find(s => s.id === id);
+      if (!song) return;
+      song.favorite = !song.favorite;
+      saveSongs();
+      render();
+    }
+
+    function removeSong(id) {
+      state.songs = state.songs.filter(s => s.id !== id);
+      state.setlist = state.setlist.filter(setId => setId !== id);
+      saveSongs();
+      saveSetlist();
+      render();
+    }
+
+    function addToSetlist(id) {
+      if (!state.setlist.includes(id)) {
+        state.setlist.push(id);
+        saveSetlist();
+        renderSetlist();
+      }
+    }
+
+    function removeFromSetlist(id) {
+      state.setlist = state.setlist.filter(x => x !== id);
+      saveSetlist();
+      renderSetlist();
+    }
+
+    function renderSetlist() {
+      const songsInSet = state.setlist
+        .map(id => state.songs.find(s => s.id === id))
+        .filter(Boolean);
+
+      if (!songsInSet.length) {
+        el.setlist.innerHTML = '<span class="chip">Setlist je zatím prázdný.</span>';
+        return;
+      }
+
+      el.setlist.innerHTML = songsInSet.map(song => `
+        <button class="ghost" data-remove-set="${song.id}" title="Odebrat ze setlistu">${song.title} ✕</button>
+      `).join('');
+    }
+
+    function renderSongs() {
+      const songs = filteredSongs();
+      el.stats.textContent = `${songs.length} / ${state.songs.length} písní | transpozice: ${state.transpose > 0 ? '+' : ''}${state.transpose}`;
+
+      if (!songs.length) {
+        el.songGrid.innerHTML = '<p class="subtitle">Nic nenalezeno. Zkuste upravit filtr nebo přidat novou píseň.</p>';
+        return;
+      }
+
+      el.songGrid.innerHTML = songs.map(song => {
+        const tags = (song.tags || []).map(tag => `<span class="chip">#${tag}</span>`).join('');
+        const lyrics = transposeLyrics(song.lyrics || '', state.transpose);
+        return `
+          <article class="song-card">
+            <h3>${song.title}</h3>
+            <div class="meta">
+              <span>${song.artist}</span>
+              <span>${song.key || '—'}</span>
+            </div>
+            <div class="chip-list">${tags || '<span class="chip">bez štítků</span>'}</div>
+            <div class="lyrics">${escapeHtml(lyrics)}</div>
+            <div class="button-row">
+              <button class="ghost" data-favorite="${song.id}">${song.favorite ? '⭐ Oblíbená' : '☆ Oblíbená'}</button>
+              <button class="ghost" data-setlist="${song.id}">➕ Setlist</button>
+              <button class="danger" data-delete="${song.id}">Smazat</button>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function escapeHtml(value) {
+      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+      return value.replace(/[&<>"']/g, m => map[m]);
+    }
+
+    function render() {
+      renderTagFilter();
+      renderSongs();
+      renderSetlist();
+    }
+
+    function addSong(event) {
+      event.preventDefault();
+      const tags = el.songTags.value
+        .split(',')
+        .map(t => t.trim())
+        .filter(Boolean);
+
+      state.songs.unshift({
+        id: crypto.randomUUID(),
+        title: el.songTitle.value.trim(),
+        artist: el.songArtist.value.trim(),
+        key: el.songKey.value.trim(),
+        tags,
+        favorite: false,
+        lyrics: el.songLyrics.value.trim()
+      });
+
+      saveSongs();
+      el.songForm.reset();
+      el.status.textContent = 'Píseň byla uložena.';
+      setTimeout(() => (el.status.textContent = ''), 2000);
+      render();
+    }
+
+    function exportJson() {
+      const blob = new Blob([JSON.stringify(state.songs, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `zpevnik-export-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importJson(file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(String(reader.result));
+          if (!Array.isArray(parsed)) {
+            el.status.textContent = 'Import selhal: JSON musí být pole písní.';
+            return;
+          }
+          state.songs = parsed.map(song => ({
+            id: song.id || crypto.randomUUID(),
+            title: song.title || 'Bez názvu',
+            artist: song.artist || 'Neznámý',
+            key: song.key || '',
+            tags: Array.isArray(song.tags) ? song.tags : [],
+            favorite: Boolean(song.favorite),
+            lyrics: song.lyrics || ''
+          }));
+          saveSongs();
+          render();
+          el.status.textContent = 'Import byl úspěšný.';
+        } catch {
+          el.status.textContent = 'Import selhal: neplatný JSON.';
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    el.searchInput.addEventListener('input', renderSongs);
+    el.tagFilter.addEventListener('change', renderSongs);
+    el.onlyFavorites.addEventListener('change', renderSongs);
+
+    el.songForm.addEventListener('submit', addSong);
+
+    el.transposeDown.addEventListener('click', () => {
+      state.transpose -= 1;
+      saveTranspose();
+      renderSongs();
+    });
+
+    el.transposeUp.addEventListener('click', () => {
+      state.transpose += 1;
+      saveTranspose();
+      renderSongs();
+    });
+
+    el.resetTranspose.addEventListener('click', () => {
+      state.transpose = 0;
+      saveTranspose();
+      renderSongs();
+    });
+
+    el.exportBtn.addEventListener('click', exportJson);
+    el.importBtn.addEventListener('click', () => el.importFile.click());
+    el.importFile.addEventListener('change', (event) => {
+      const file = event.target.files?.[0];
+      if (file) importJson(file);
+      el.importFile.value = '';
+    });
+
+    el.songGrid.addEventListener('click', (event) => {
+      const button = event.target.closest('button');
+      if (!button) return;
+      const favoriteId = button.dataset.favorite;
+      const deleteId = button.dataset.delete;
+      const setlistId = button.dataset.setlist;
+
+      if (favoriteId) toggleFavorite(favoriteId);
+      if (deleteId) removeSong(deleteId);
+      if (setlistId) addToSetlist(setlistId);
+    });
+
+    el.setlist.addEventListener('click', (event) => {
+      const button = event.target.closest('button[data-remove-set]');
+      if (button) removeFromSetlist(button.dataset.removeSet);
+    });
+
+    render();
+  </script>
 </body>
 </html>
