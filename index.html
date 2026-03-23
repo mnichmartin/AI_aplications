@@ -1,164 +1,453 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Odkazy na aplikace AI</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 20px;
-        }
-        .app-container {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin: 10px;
-            padding: 20px;
-            text-align: center;
-            width: 250px;
-        }
-        .app-container img {
-            border-radius: 8px;
-            height: 150px;
-            width: 100%;
-            object-fit: cover;
-        }
-        .app-container button {
-            background-color: #007bff;
-            border: none;
-            border-radius: 4px;
-            color: #fff;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 10px;
-            padding: 10px 20px;
-            width: 100%;
-        }
-        .app-container button:hover {
-            background-color: #0056b3;
-        }
-        .app-container.red-button button {
-            background-color: #dc3545;
-        }
-        .app-container.red-button button:hover {
-            background-color: #b02a37;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Karty zákazníka</title>
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --card: #ffffff;
+      --text: #1d2230;
+      --muted: #667085;
+      --primary: #3056d3;
+      --primary-dark: #2445ad;
+      --accent: #16a34a;
+      --danger: #dc2626;
+      --border: #d0d5dd;
+      --shadow: 0 8px 24px rgba(16, 24, 40, 0.08);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 460px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .panel {
+      background: var(--card);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+
+    h1, h2, h3 {
+      margin: 0 0 10px;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+    }
+
+    h2 {
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .region-selector {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 12px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.2s ease;
+    }
+
+    .btn.primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn.primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn.outline {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+    }
+
+    .btn.danger {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    form {
+      display: grid;
+      gap: 10px;
+    }
+
+    label {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    input, select {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 1rem;
+    }
+
+    .capture-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .capture-box {
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      padding: 10px;
+      text-align: center;
+      background: #fbfcff;
+    }
+
+    .capture-box img {
+      margin-top: 8px;
+      width: 100%;
+      height: 94px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 1px solid #e4e7ec;
+      background: #fff;
+    }
+
+    .top-cards,
+    .all-cards {
+      display: grid;
+      gap: 10px;
+    }
+
+    .card-item {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+      background: #fff;
+      display: grid;
+      gap: 8px;
+    }
+
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .badge {
+      background: #eef4ff;
+      color: var(--primary);
+      border-radius: 20px;
+      padding: 3px 9px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .thumb {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 1px solid #e4e7ec;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .actions .btn {
+      flex: 1;
+      padding: 9px 10px;
+      font-size: 0.86rem;
+    }
+
+    .empty {
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      color: var(--muted);
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
+  <main class="app">
+    <section id="regionPanel" class="panel">
+      <h1>Karty zákazníků</h1>
+      <p class="muted">Nejdříve zvolte, jestli chcete pracovat s českými nebo slovenskými kartami.</p>
+      <div class="region-selector">
+        <button class="btn primary" data-region="CZ" type="button">České karty (CZ)</button>
+        <button class="btn outline" data-region="SK" type="button">Slovenské karty (SK)</button>
+      </div>
+    </section>
 
-    <div class="app-container">
-        <img src="suno_image.jpg" alt="Suno">
-        <h3>Suno</h3>
-        <p>AI platforma umožňující tvorbu hudby pomocí textových vstupů.</p>
-        <button onclick="window.open('https://suno.com/', '_blank')">Navštívit Suno</button>
-    </div>
+    <section id="createPanel" class="panel hidden">
+      <h2>Přidat novou kartu</h2>
+      <form id="cardForm">
+        <div>
+          <label for="cardName">Název karty</label>
+          <input id="cardName" name="cardName" required placeholder="Např. Tesco Clubcard" />
+        </div>
+        <div>
+          <label for="cardCountry">Typ karty</label>
+          <select id="cardCountry" name="cardCountry" required>
+            <option value="CZ">Česká karta (CZ)</option>
+            <option value="SK">Slovenská karta (SK)</option>
+          </select>
+        </div>
 
-    <div class="app-container">
-        <img src="cleanup_pictures_image.jpg" alt="Cleanup.pictures">
-        <h3>Cleanup.pictures</h3>
-        <p>Nástroj pro odstranění nechtěných objektů z fotografií.</p>
-        <button onclick="window.open('https://cleanup.pictures/', '_blank')">Navštívit Cleanup.pictures</button>
-    </div>
+        <div class="capture-grid">
+          <div class="capture-box">
+            <label for="frontInput">Přední strana</label>
+            <input id="frontInput" type="file" accept="image/*" capture="environment" required />
+            <img id="frontPreview" alt="Náhled přední strany" src="" class="hidden" />
+          </div>
+          <div class="capture-box">
+            <label for="backInput">Zadní strana</label>
+            <input id="backInput" type="file" accept="image/*" capture="environment" required />
+            <img id="backPreview" alt="Náhled zadní strany" src="" class="hidden" />
+          </div>
+        </div>
 
-    <div class="app-container">
-        <img src="pimeyes_image.jpg" alt="PimEyes">
-        <h3>PimEyes</h3>
-        <p>Vyhledávač obličejů využívající technologii rozpoznávání tváře.</p>
-        <button onclick="window.open('https://pimeyes.com/en', '_blank')">Navštívit PimEyes</button>
-    </div>
+        <button class="btn primary" type="submit">Uložit kartu do mobilu</button>
+      </form>
+    </section>
 
-    <div class="app-container">
-        <img src="quickdraw_image.jpg" alt="Quick, Draw!">
-        <h3>Quick, Draw!</h3>
-        <p>Hra od Googlu, kde neuronová síť hádá, co kreslíte.</p>
-        <button onclick="window.open('https://quickdraw.withgoogle.com/', '_blank')">Hrát Quick, Draw!</button>
-    </div>
+    <section id="topPanel" class="panel hidden">
+      <h2>6 nejpoužívanějších karet</h2>
+      <div id="topCards" class="top-cards"></div>
+    </section>
 
-    <div class="app-container">
-        <img src="autodraw_image.jpg" alt="AutoDraw">
-        <h3>AutoDraw</h3>
-        <p>Nástroj od Googlu, který pomocí AI pomáhá rychle kreslit.</p>
-        <button onclick="window.open('https://www.autodraw.com/', '_blank')">Použít AutoDraw</button>
-    </div>
+    <section id="allPanel" class="panel hidden">
+      <h2>Abecední seznam všech karet</h2>
+      <div id="allCards" class="all-cards"></div>
+    </section>
+  </main>
 
-    <div class="app-container">
-        <img src="character_ai_image.jpg" alt="Character.AI">
-        <h3>Character.AI</h3>
-        <p>Platforma pro vytváření a interakci s virtuálními postavami.</p>
-        <button onclick="window.open('https://character.ai/', '_blank')">Navštívit Character.AI</button>
-    </div>
+  <script>
+    const STORAGE_KEY = "customerCardsV1";
+    const REGION_KEY = "selectedCardRegion";
 
-    <div class="app-container">
-        <img src="elevenlabs_image.jpg" alt="ElevenLabs">
-        <h3>ElevenLabs</h3>
-        <p>Pokročilý nástroj pro syntézu řeči a klonování hlasu pomocí AI.</p>
-        <button onclick="window.open('https://elevenlabs.io/', '_blank')">Navštívit ElevenLabs</button>
-    </div>
+    const state = {
+      selectedRegion: localStorage.getItem(REGION_KEY) || "",
+      cards: JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]")
+    };
 
-    <div class="app-container">
-        <img src="isitai_image.jpg" alt="IsItAI">
-        <h3>IsItAI</h3>
-        <p>Nástroj pro detekci obsahu generovaného umělou inteligencí.</p>
-        <button onclick="window.open('https://isitai.com/', '_blank')">Navštívit IsItAI</button>
-    </div>
+    const regionPanel = document.getElementById("regionPanel");
+    const createPanel = document.getElementById("createPanel");
+    const topPanel = document.getElementById("topPanel");
+    const allPanel = document.getElementById("allPanel");
 
-    <div class="app-container">
-        <img src="chatgpt_image.jpg" alt="ChatGPT">
-        <h3>ChatGPT</h3>
-        <p>Pokročilý AI chatbot od společnosti OpenAI.</p>
-        <button onclick="window.open('https://chat.openai.com/', '_blank')">Navštívit ChatGPT</button>
-    </div>
+    const cardForm = document.getElementById("cardForm");
+    const cardCountry = document.getElementById("cardCountry");
+    const cardName = document.getElementById("cardName");
 
-<div class="app-container">
-    <img src="microsoft_copilot_image.jpg" alt="Microsoft Copilot">
-    <h3>Microsoft Copilot</h3>
-    <p>AI asistent od společnosti Microsoft, navržený pro zvýšení produktivity a efektivity uživatelů.</p>
-    <button onclick="window.open('https://copilot.microsoft.com/', '_blank')">Navštívit Microsoft Copilot</button>
-</div>
+    const frontInput = document.getElementById("frontInput");
+    const backInput = document.getElementById("backInput");
+    const frontPreview = document.getElementById("frontPreview");
+    const backPreview = document.getElementById("backPreview");
 
-    <div class="app-container">
-        <img src="geminy_image.jpg" alt="GEMINY">
-        <h3>GEMINY</h3>
-        <p>Pokročilý multimodální AI model od Google DeepMind.</p>
-        <button onclick="window.open('https://gemini.google.com/app?hl=cs', '_blank')">Navštívit GEMINY</button>
-    </div>
+    const topCardsEl = document.getElementById("topCards");
+    const allCardsEl = document.getElementById("allCards");
 
-    <div class="app-container">
-        <img src="mistral_image.jpg" alt="MISTRAL">
-        <h3>MISTRAL</h3>
-        <p>Open-source AI model zaměřený na překonání současných standardů.</p>
-        <button onclick="window.open('https://mistral.ai/', '_blank')">Navštívit MISTRAL</button>
-    </div>
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.cards));
+      localStorage.setItem(REGION_KEY, state.selectedRegion);
+    }
 
-    <div class="app-container">
-        <img src="deepseek_image.jpg" alt="DEEPSEEK">
-        <h3>DEEPSEEK</h3>
-        <p>Čínský AI model známý svou efektivitou a výkonem.</p>
-        <button onclick="window.open('https://deepseek.ai/', '_blank')">Navštívit DeepSeek</button>
-    </div>
+    function toDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
 
-    <div class="app-container">
-        <img src="claude_image.jpg" alt="Sonet Claude 3.7">
-        <h3>Sonet Claude 3.7</h3>
-        <p>Pokročilý AI chatbot od společnosti Anthropic, zaměřený na bezpečnost a spolehlivost.</p>
-        <button onclick="window.open('https://claude.ai/', '_blank')">Navštívit Claude 3.7</button>
-    </div>
+    async function handleImagePreview(input, imgEl) {
+      const file = input.files?.[0];
+      if (!file) {
+        imgEl.classList.add("hidden");
+        imgEl.src = "";
+        return;
+      }
+      imgEl.src = await toDataUrl(file);
+      imgEl.classList.remove("hidden");
+    }
 
+    function incrementUsage(cardId) {
+      const card = state.cards.find((c) => c.id === cardId);
+      if (!card) return;
+      card.usage += 1;
+      saveState();
+      renderLists();
+    }
 
-    <div class="app-container red-button">
-        <img src="centrum_image.jpg" alt="Centrum.cz">
-        <h3>Centrum.cz</h3>
-        <p>Český internetový portál s e-mailem a zprávami.</p>
-        <button onclick="window.open('https://ucet.centrum.cz/prihlaseni/', '_blank')">Navštívit Centrum.cz</button>
-    </div>
+    function deleteCard(cardId) {
+      state.cards = state.cards.filter((c) => c.id !== cardId);
+      saveState();
+      renderLists();
+    }
 
+    function renderLists() {
+      const filtered = state.cards.filter((card) => card.country === state.selectedRegion);
+
+      const topCards = [...filtered]
+        .sort((a, b) => b.usage - a.usage || a.name.localeCompare(b.name, "cs"))
+        .slice(0, 6);
+
+      const allCards = [...filtered].sort((a, b) => a.name.localeCompare(b.name, "cs"));
+
+      topCardsEl.innerHTML = "";
+      allCardsEl.innerHTML = "";
+
+      if (topCards.length === 0) {
+        topCardsEl.innerHTML = `<div class="empty">Zatím zde nejsou žádné karty.</div>`;
+      } else {
+        topCards.forEach((card) => topCardsEl.appendChild(createCardElement(card, true)));
+      }
+
+      if (allCards.length === 0) {
+        allCardsEl.innerHTML = `<div class="empty">Abecední seznam je zatím prázdný.</div>`;
+      } else {
+        allCards.forEach((card) => allCardsEl.appendChild(createCardElement(card, false)));
+      }
+    }
+
+    function createCardElement(card, fromTopList) {
+      const wrapper = document.createElement("article");
+      wrapper.className = "card-item";
+
+      const from = fromTopList ? "top" : "all";
+
+      wrapper.innerHTML = `
+        <div class="card-head">
+          <strong>${card.name}</strong>
+          <span class="badge">Použití: ${card.usage}×</span>
+        </div>
+        <div class="muted">Typ: ${card.country}</div>
+        <img class="thumb" src="${card.frontImage}" alt="Přední strana karty ${card.name}" />
+        <div class="actions">
+          <button class="btn outline" data-id="${card.id}" data-action="open-front" data-from="${from}" type="button">Přední</button>
+          <button class="btn outline" data-id="${card.id}" data-action="open-back" data-from="${from}" type="button">Zadní</button>
+          <button class="btn danger" data-id="${card.id}" data-action="delete" data-from="${from}" type="button">Smazat</button>
+        </div>
+      `;
+
+      return wrapper;
+    }
+
+    function openImageInNewTab(dataUrl, cardId) {
+      const opened = window.open();
+      if (opened) {
+        opened.document.write(`<img src="${dataUrl}" alt="Náhled karty" style="max-width:100%;height:auto;"/>`);
+      }
+      incrementUsage(cardId);
+    }
+
+    function applyRegion(region) {
+      state.selectedRegion = region;
+      cardCountry.value = region;
+      createPanel.classList.remove("hidden");
+      topPanel.classList.remove("hidden");
+      allPanel.classList.remove("hidden");
+      saveState();
+      renderLists();
+    }
+
+    document.querySelectorAll("[data-region]").forEach((btn) => {
+      btn.addEventListener("click", () => applyRegion(btn.dataset.region));
+    });
+
+    frontInput.addEventListener("change", () => handleImagePreview(frontInput, frontPreview));
+    backInput.addEventListener("change", () => handleImagePreview(backInput, backPreview));
+
+    cardForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!frontInput.files?.[0] || !backInput.files?.[0]) return;
+
+      const frontImage = await toDataUrl(frontInput.files[0]);
+      const backImage = await toDataUrl(backInput.files[0]);
+
+      const card = {
+        id: crypto.randomUUID(),
+        name: cardName.value.trim(),
+        country: cardCountry.value,
+        frontImage,
+        backImage,
+        usage: 0,
+        createdAt: new Date().toISOString()
+      };
+
+      state.cards.push(card);
+      saveState();
+      cardForm.reset();
+      frontPreview.classList.add("hidden");
+      backPreview.classList.add("hidden");
+      renderLists();
+    });
+
+    function attachActions(container) {
+      container.addEventListener("click", (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLButtonElement)) return;
+
+        const cardId = target.dataset.id;
+        const action = target.dataset.action;
+        if (!cardId || !action) return;
+
+        const card = state.cards.find((c) => c.id === cardId);
+        if (!card) return;
+
+        if (action === "open-front") openImageInNewTab(card.frontImage, cardId);
+        if (action === "open-back") openImageInNewTab(card.backImage, cardId);
+        if (action === "delete") {
+          const confirmed = window.confirm(`Opravdu smazat kartu \"${card.name}\"?`);
+          if (confirmed) deleteCard(cardId);
+        }
+      });
+    }
+
+    attachActions(topCardsEl);
+    attachActions(allCardsEl);
+
+    if (state.selectedRegion) {
+      applyRegion(state.selectedRegion);
+    }
+  </script>
 </body>
 </html>
